@@ -23,9 +23,8 @@ def colsToUse(df1):
     return df2
 
 
-palabrasGeneral = [' precios ' , 'precios ', 'precios ', ' precio ', 'precio ' , ' precio' , ' colores ', ' valor ', ' de segunda ' , ' baratos ',' barato ', ' economicos ' ,' y ']
 
-def cleanKw(df):
+def cleanKwMatchType(df):
     '''Nos permite limpiar los terminos de busqueda y prepararlos para la url'''
     #caracteres matchtype
     replaceList = ['"','+', '[', ']']
@@ -40,10 +39,15 @@ def cleanKw(df):
     for i in replaceList:
         df1['kwNoMatchType'] = df1['kwNoMatchType'].str.replace(i, '')
 
+    return df1 
+
+def cleanKwGeneral(df, lista):
+
+    df1 = df.copy()
     df1['kwNoGeneralList'] = df1['kwNoMatchType'].copy()
 
     #Limpiamos palabras Generales
-    for j in palabrasGeneral:
+    for j in lista:
         df1['kwNoGeneralList'] = df1['kwNoGeneralList'].str.replace(j, ' ')
     
     # Borramos espacios en blanco en ambos lados 
@@ -51,7 +55,6 @@ def cleanKw(df):
     # Remplazamos el espacio que separa por guión medio 
     df1['kwCleanSlash'] = df1['kwClean'].str.replace(' ','-')
     return df1
-
 
 def armarCombinaciones(listaPalabras):
     '''Nos permite armar combinaciones de palabras agregando espacios antes, después, ambos y palabra original'''
@@ -74,7 +77,15 @@ file = readFile(file_path)
 
 reducido = colsToUse(file)
 
-reducidoLimpio = cleanKw(reducido)
+reducidoNoMatchType = cleanKwMatchType(reducido)
+
+
+palabrasExcluir = ['precios','precio', 'valor', 'de segunda', 'baratos' , 'barato', 'economicos', 'economico', 'nuevos', 'nuevo', 'liberados', 'liberado', ' y ', ' en ', ' de ', ' a ', 'ofertas', 'oferta', 'promociones' , 'promocion', 'peru', 'colombia', 'mexico', 'chile','uruguay', 'salta', 'cordoba', 'bogota', 'rosario', ' del ']
+
+
+combinacionesExcluir = armarCombinaciones(palabrasExcluir)
+
+reducidoLimpio = cleanKwGeneral(reducidoNoMatchType, combinacionesExcluir)
 
 reducidoLimpio.head()   
 
@@ -85,35 +96,13 @@ UrlPais = 'https://listado.mercadolibre.com.ar/'
 
 reducidoLimpio['preUrl'] = UrlPais
 
-reducidoLimpio['urlArmada'] = reducidoLimpio['preUrl'] + reducidoLimpio['kwCopy']
+reducidoLimpio['urlArmada'] = reducidoLimpio['preUrl'] + reducidoLimpio['kwCleanSlash']
 # %%
 
-# %%
 
-palabrasExcluir = ['precio', 'barato', 'peru']
+control = reducidoLimpio.dropna().copy()
 
-def armarCombinaciones(listaPalabras):
-    combinacionesPalabras = []
-    for pal in listaPalabras: 
-        nuevaCombinacion = " " + pal + " "
-        combinacionesPalabras.append(nuevaCombinacion)
-        nuevaCombinacion = " " +  pal 
-        combinacionesPalabras.append(nuevaCombinacion)
-        nuevaCombinacion = pal + " "
-        combinacionesPalabras.append(nuevaCombinacion)
-        combinacionesPalabras.append(pal)
-    return combinacionesPalabras
-
-
-combinacionesExcluir = armarCombinaciones(palabrasExcluir)
-
-print(combinacionesExcluir)
-
+cargar = reducidoLimpio[['Campaña', 'Grupo de anuncios', 'Palabra clave', 'urlArmada']].dropna().copy()
 
 # %%
 
-# %%
-
-# %%
-
-# %%
