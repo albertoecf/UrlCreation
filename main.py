@@ -13,11 +13,11 @@ import pandas as pd
 
 def readFile(file_path):
     try:
-        df2 = pd.read_csv(file_path)
+        df2 = pd.read_csv(file_path, skiprows=2)
         print('csv')
     except:
         try: 
-            df2 = pd.read_excel(file_path)
+            df2 = pd.read_excel(file_path, skiprows=2)
             print('excel')
         except:
             print('not file found')
@@ -84,7 +84,7 @@ def armarCombinaciones(listaPalabras):
 
 # 2.1) Leemos el archivo 
 
-file_path = 'celuExcel.xlsx - celulares.csv'
+file_path = 'Informe de palabras clave de búsqueda (6).csv'
 file = readFile(file_path)
 
 # 2.2) Seleccionamos las columnas de interes
@@ -134,3 +134,6 @@ nombreDescarga = Vertical + "_" + Pais + '.xlsx'
 
 
 # %%
+
+
+
