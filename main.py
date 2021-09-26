@@ -1,6 +1,15 @@
 #%%
-from os import replace
+
+# INPUT : DESCARGAR DESDE GOOGLE ADS A NIVEL ADGROUP 
+# OUTPUT : DEVUELVE UNA URL PARA CADA KW 
+
+# 0) Importamos librerias necesarias 
 import pandas as pd
+# para usar en google Colab y poder descargar archivos 
+# from google.colab import files
+
+
+#1) DEFINIMOS FUNCIONES 
 
 def readFile(file_path):
     try:
@@ -25,7 +34,7 @@ def colsToUse(df1):
 
 
 def cleanKwMatchType(df):
-    '''Nos permite limpiar los terminos de busqueda y prepararlos para la url'''
+    '''Nos permite limpiar los terminos de busqueda según matchType'''
     #caracteres matchtype
     replaceList = ['"','+', '[', ']']
     #Palabras a excluir
@@ -42,7 +51,7 @@ def cleanKwMatchType(df):
     return df1 
 
 def cleanKwGeneral(df, lista):
-
+    '''Nos permite limpiar los terminos de busqueda según palabras no deseadas. '''
     df1 = df.copy()
     df1['kwNoGeneralList'] = df1['kwNoMatchType'].copy()
 
@@ -71,38 +80,57 @@ def armarCombinaciones(listaPalabras):
 
 
 #%%
-# Accionable 
+# 2) EJECUCIÓN 
+
+# 2.1) Leemos el archivo 
+
 file_path = 'celuExcel.xlsx - celulares.csv'
 file = readFile(file_path)
 
+# 2.2) Seleccionamos las columnas de interes
 reducido = colsToUse(file)
 
+#2.3) Limpiamos los caracteres relacionados al matchtype
 reducidoNoMatchType = cleanKwMatchType(reducido)
 
+# 2.4) Armamos lista de palabras no deseadas
 
 palabrasExcluir = ['precios','precio', 'valor', 'de segunda', 'baratos' , 'barato', 'economicos', 'economico', 'nuevos', 'nuevo', 'liberados', 'liberado', ' y ', ' en ', ' de ', ' a ', 'ofertas', 'oferta', 'promociones' , 'promocion', 'peru', 'colombia', 'mexico', 'chile','uruguay', 'salta', 'cordoba', 'bogota', 'rosario', ' del ']
 
-
+# 2.5) Arma lista de combinaciones agregando espacios antes después y ambas 
 combinacionesExcluir = armarCombinaciones(palabrasExcluir)
 
+# 2.6) con la lista generada en 2.5) limpiamos las kw y reemplazamos espacio por - 
 reducidoLimpio = cleanKwGeneral(reducidoNoMatchType, combinacionesExcluir)
 
-reducidoLimpio.head()   
-
-
-
-
+# 2.7) Seleccionamos la url con la que vamos a armar las urlFinales (listado y por pais)
 UrlPais = 'https://listado.mercadolibre.com.ar/'
 
+# 2.8) Armamos la url asociada a cada KW
 reducidoLimpio['preUrl'] = UrlPais
-
 reducidoLimpio['urlArmada'] = reducidoLimpio['preUrl'] + reducidoLimpio['kwCleanSlash']
-# %%
 
 
+# 3) OUTPUT : Van a ser dos archivos, uno de control, dónde podemos comparar cada kw original con la final. Y otro archivo directo para cargar con las columnas necesarias
 control = reducidoLimpio.dropna().copy()
-
 cargar = reducidoLimpio[['Campaña', 'Grupo de anuncios', 'Palabra clave', 'urlArmada']].dropna().copy()
 
-# %%
+#%%
+# 3.1) Para usar en colab : 
 
+# 3.2) Remplazamos con el nombre de la vertical y pais
+
+Vertical = 'Celulares'
+Pais = 'MLA'
+
+# 3.3) Arma el nombre de archivo 
+nombreDescarga = Vertical + "_" + Pais + '.xlsx'
+
+# 3.4) Nos descarga el archivo 
+#cargar.to_excel(nombreDescarga)
+#files.download(nombreDescarga)
+
+
+
+
+# %%
