@@ -79,6 +79,17 @@ def armarCombinaciones(listaPalabras):
     return combinacionesPalabras
 
 
+def armarFiltros(df1):
+    '''Nos permite armar la lógica para filtrar los adgroups'''
+    try: 
+        df2 = df1.copy() 
+        df2['COMP'] = df2['Grupo de anuncios'].str.startswith('COMP_')
+        df2['Mpura'] = df2['Grupo de anuncios'].str.startswith('MARC_Pura')
+        df2['To'] = df2['Grupo de anuncios'].str.contains('_TO')
+        return df2
+    except: 
+        print('Fallo armarFiltros')
+
 #%%
 # 2) EJECUCIÓN 
 
