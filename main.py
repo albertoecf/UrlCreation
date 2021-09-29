@@ -147,4 +147,14 @@ nombreDescarga = Vertical + "_" + Pais + '.xlsx'
 # %%
 
 
+#   WIP LOGICA
+validar = armarFiltros(reducidoLimpio)
 
+
+def validos(df1):
+    df2 = df1.copy()
+    df2 = df2[df2['COMP']==False]
+    df2 = df2[(df2['Mpura']==True)&(df2['To']==False)]
+    return df2
+
+validar_final = validos(validar)
